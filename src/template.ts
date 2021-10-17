@@ -1,14 +1,24 @@
-import { SwaggerConfigs } from "swagger-ui-dist";
+import { join } from "path";
+import { SwaggerOptions } from "./interface";
 
-export const generateHtml = (config?: SwaggerConfigs) => `
+export const generateHtml = (options: Omit<SwaggerOptions, "gzip">) => {
+  const getPath = (path: string) => join(options.routePrefix!, path);
+
+  return `
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
     <title>Swagger UI</title>
-    <link rel="stylesheet" type="text/css" href="./swagger-ui.css" />
-    <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" type="text/css" href="${getPath(
+      "./swagger-ui.css"
+    )}"/>
+    <link rel="icon" type="image/png" href="${getPath(
+      "./favicon-32x32.png"
+    )}" sizes="32x32" />
+    <link rel="icon" type="image/png" href="${getPath(
+      "./favicon-16x16.png"
+    )}" sizes="16x16" />
     <style>
       html
       {
@@ -35,13 +45,19 @@ export const generateHtml = (config?: SwaggerConfigs) => `
   <body>
     <div id="swagger-ui"></div>
 
-    <script src="./swagger-ui-bundle.js" charset="UTF-8"> </script>
-    <script src="./swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
+    <script src="${getPath(
+      "./swagger-ui-bundle.js"
+    )}" charset="UTF-8"> </script>
+    <script src="${getPath(
+      "./swagger-ui-standalone-preset.js"
+    )}" charset="UTF-8"> </script>
     <script>
     window.onload = function() {
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        url: "https://petstore.swagger.io/v2/swagger.json",
+        url: ${JSON.stringify(options.url)},
+        urls: ${JSON.stringify(options.urls)},
+        spec: ${JSON.stringify(options.spec)},
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -51,7 +67,8 @@ export const generateHtml = (config?: SwaggerConfigs) => `
         plugins: [
           SwaggerUIBundle.plugins.DownloadUrl
         ],
-        layout: "StandaloneLayout"
+        layout: "StandaloneLayout",
+        validatorUrl: null
       });
       // End Swagger UI call region
 
@@ -61,3 +78,4 @@ export const generateHtml = (config?: SwaggerConfigs) => `
   </body>
 </html>
 `;
+};
